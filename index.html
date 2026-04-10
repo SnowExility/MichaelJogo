@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Michael: Em Busca do Big Mac Perdido</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@700;900&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════ INTRO SCREEN ═══════════════════ -->
+  <div id="intro-screen">
+    <div id="intro-text-box">
+      <p id="intro-line" class="intro-line"></p>
+    </div>
+    <button id="skip-btn" onclick="skipIntro()">▶ PULAR</button>
+    <div class="scanlines"></div>
+  </div>
+
+  <!-- ═══════════════════ MAIN MENU ═══════════════════ -->
+  <div id="menu-screen" class="hidden">
+    <div id="menu-bg"></div>
+    <div id="menu-overlay"></div>
+    <div class="scanlines"></div>
+
+    <div id="hud-top">
+      <div id="nugget-counter">
+        <span id="nugget-icon">🍗</span>
+        <span id="nugget-label">NUGGETS:</span>
+        <span id="nugget-value">0</span>
+      </div>
+      <button id="settings-btn" class="menu-btn-corner" onclick="openModal('settings')" title="Configurações">☰</button>
+    </div>
+
+    <div id="title-block">
+      <div id="title-shadow">MICHAEL</div>
+      <div id="title-main">MICHAEL</div>
+      <div id="subtitle">EM BUSCA DO BIG MAC PERDIDO</div>
+      <div id="title-flavor">Uma história baseada em fatos que não aconteceram</div>
+    </div>
+
+    <nav id="menu-nav">
+      <button class="menu-btn btn-play" onclick="startNewGame()">
+        <span class="btn-icon">▶</span> NOVO JOGO
+      </button>
+      <button class="menu-btn btn-continue" id="btn-continue" onclick="continueGame()">
+        <span class="btn-icon">↺</span> CONTINUAR
+      </button>
+      <button class="menu-btn btn-help" onclick="openModal('help')">
+        <span class="btn-icon">?</span> AJUDA
+      </button>
+      <button class="menu-btn btn-credits" onclick="openModal('credits')">
+        <span class="btn-icon">★</span> CRÉDITOS
+      </button>
+    </nav>
+
+    <div id="version-tag">v0.1 – ALPHA GORDÃO</div>
+
+    <!-- Ingredient progress tracker -->
+    <div id="ingredient-tracker-wrap">
+      <div id="ingredient-tracker-label">🍔 INGREDIENTES</div>
+      <div id="ingredient-tracker"></div>
+    </div>
+
+    <!-- Completion toast -->
+    <div id="completion-toast" class="hidden"></div>
+
+    <!-- Gamepad connected indicator -->
+    <div id="gp-indicator" class="hidden">
+      <span id="gp-indicator-icon"></span>
+      <span id="gp-indicator-text">Controle detectado</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ BOOK INTRO SCREEN ═══════════════════ -->
+  <div id="book-screen" class="hidden">
+    <div id="book-screen-bg"></div>
+    <div class="scanlines" style="opacity:0.35"></div>
+    <button id="book-skip-btn" onclick="skipBookIntro()">▶ PULAR INTRO</button>
+
+    <div id="book-scene">
+
+      <!-- Closed book -->
+      <div id="book-closed">
+        <div class="book3d-wrap" onclick="openBook()">
+          <div class="book3d-spine"></div>
+          <div class="book3d-face">
+            <div class="book3d-face-inner">
+              <div class="book3d-ornament">⊱ ────── ⊰</div>
+              <div class="book3d-burger">🍔</div>
+              <div class="book3d-title">MICHAEL</div>
+              <div class="book3d-subtitle">Em Busca do<br>Big Mac Perdido</div>
+              <div class="book3d-ornament">⊱ ────── ⊰</div>
+              <div class="book3d-cta">[ Clique para abrir ]</div>
+            </div>
+          </div>
+          <div class="book3d-back"></div>
+          <div class="book3d-pages-side"></div>
+          <div class="book3d-top"></div>
+          <div class="book3d-bottom"></div>
+        </div>
+      </div>
+
+      <!-- Open book -->
+      <div id="book-open" class="hidden">
+        <div id="book-frame">
+          <div id="book-spine-center"></div>
+
+          <div id="book-page-left" class="book-page page-left" onclick="prevPage()">
+            <div id="left-page-content" class="page-content"></div>
+            <div class="page-turn-hint left-hint">◀ voltar</div>
+            <div class="page-corner-fold left-fold"></div>
+          </div>
+
+          <div id="book-page-right" class="book-page page-right" onclick="nextPage()">
+            <div id="right-page-content" class="page-content"></div>
+            <div class="page-turn-hint right-hint">avançar ▶</div>
+            <div class="page-corner-fold right-fold"></div>
+          </div>
+        </div>
+
+        <div id="page-indicator">
+          <div id="page-dots"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════ MODALS ═══════════════════ -->
+  <div id="modal-backdrop" class="hidden" onclick="closeAllModals()"></div>
+
+  <div id="modal-credits" class="modal hidden">
+    <div class="modal-header">
+      <span class="modal-title">★ CRÉDITOS ★</span>
+      <button class="modal-close" onclick="closeAllModals()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="credit-block"><p class="credit-role">DIRETOR EXECUTIVO DE ZOAÇÕES</p><p class="credit-name">Seu amigo cruel</p></div>
+      <div class="credit-block"><p class="credit-role">PROTAGONISTA INVOLUNTÁRIO</p><p class="credit-name">Michael "Big Mac" Silva</p></div>
+      <div class="credit-block"><p class="credit-role">INSPIRAÇÃO CULINÁRIA</p><p class="credit-name">McDonald's (sem patrocínio)</p></div>
+      <div class="credit-block"><p class="credit-role">ENGINE DO JOGO</p><p class="credit-name">HTML puro mesmo, sem vergonha</p></div>
+      <div class="credit-block"><p class="credit-role">TRILHA SONORA</p><p class="credit-name">Silêncio constrangedor</p></div>
+      <div class="credit-block"><p class="credit-role">DIREITOS AUTORAIS</p><p class="credit-name">0%. Roubei mesmo.</p></div>
+      <p class="credit-footer">🍔 Nenhum Big Mac foi prejudicado na produção deste jogo 🍔</p>
+    </div>
+  </div>
+
+  <div id="modal-help" class="modal hidden">
+    <div class="modal-header">
+      <span class="modal-title">? AJUDA ?</span>
+      <button class="modal-close" onclick="closeAllModals()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="help-section">
+        <p class="help-title">🎮 OBJETIVO</p>
+        <p class="help-text">Michael estava no McDonald's quando descobriu o impensável: o Big Mac foi ROUBADO. Percorra 8 fases coletando os ingredientes e recupere a honra da lanchonete!</p>
+      </div>
+      <div class="help-section">
+        <p class="help-title">📋 FASES</p>
+        <p class="help-text">Fase 1: Pão (base) • Fase 2: Carne • Fase 3: Queijo • Fase 4: Alface • Fase 5: Molho especial • Fase 6: Cebola • Fase 7: Pão do meio • Fase 8: 🍟 Batata + refri (BOSS FINAL)</p>
+      </div>
+      <div class="help-section">
+        <p class="help-title">🍗 NUGGETS</p>
+        <p class="help-text">A moeda do jogo! Colete Nuggets nas fases para desbloquear conteúdos extras.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-settings" class="modal modal-wide hidden">
+    <div class="modal-header">
+      <span class="modal-title">⚙ CONFIGURAÇÕES</span>
+      <button class="modal-close" onclick="closeAllModals()">✕</button>
+    </div>
+    <div id="settings-tabs">
+      <button class="tab-btn active" onclick="switchTab('audio')">🔊 ÁUDIO</button>
+      <button class="tab-btn" onclick="switchTab('graphics')">🎨 GRÁFICOS</button>
+      <button class="tab-btn" onclick="switchTab('screen')">🖥 TELA</button>
+      <button class="tab-btn" onclick="switchTab('controls')">🎮 CONTROLES</button>
+      <button class="tab-btn" onclick="switchTab('promo')">🎁 CÓDIGOS</button>
+    </div>
+    <div id="tab-audio" class="tab-content active">
+      <div class="setting-row">
+        <label class="setting-label">MÚSICA</label>
+        <div class="slider-wrap">
+          <input type="range" min="0" max="100" value="80" id="vol-music" oninput="updateSetting('musicVol',this.value);document.getElementById('vol-music-val').textContent=this.value"/>
+          <span id="vol-music-val" class="slider-val">80</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label class="setting-label">EFEITOS</label>
+        <div class="slider-wrap">
+          <input type="range" min="0" max="100" value="80" id="vol-sfx" oninput="updateSetting('sfxVol',this.value);document.getElementById('vol-sfx-val').textContent=this.value"/>
+          <span id="vol-sfx-val" class="slider-val">80</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label class="setting-label">MUDO</label>
+        <button id="btn-mute" class="toggle-btn" onclick="toggleMute()">OFF</button>
+      </div>
+    </div>
+    <div id="tab-graphics" class="tab-content hidden">
+      <div class="setting-row">
+        <label class="setting-label">QUALIDADE</label>
+        <div class="option-group">
+          <button class="opt-btn" onclick="setOption(this,'graphicsQuality','baixa')">BAIXA</button>
+          <button class="opt-btn active" onclick="setOption(this,'graphicsQuality','media')">MÉDIA</button>
+          <button class="opt-btn" onclick="setOption(this,'graphicsQuality','alta')">ALTA</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label class="setting-label">SCANLINES</label>
+        <button id="btn-scanlines" class="toggle-btn active-on" onclick="toggleScanlines()">ON</button>
+      </div>
+      <div class="setting-row">
+        <label class="setting-label">PIXEL PERFEITO</label>
+        <button id="btn-pixel" class="toggle-btn active-on" onclick="togglePixel()">ON</button>
+      </div>
+    </div>
+    <div id="tab-screen" class="tab-content hidden">
+      <div class="setting-row">
+        <label class="setting-label">RESOLUÇÃO</label>
+        <div class="option-group">
+          <button class="opt-btn" onclick="setOption(this,'resolution','640')">640×480</button>
+          <button class="opt-btn active" onclick="setOption(this,'resolution','1280')">1280×720</button>
+          <button class="opt-btn" onclick="setOption(this,'resolution','1920')">1920×1080</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label class="setting-label">TELA CHEIA</label>
+        <button id="btn-fullscreen" class="toggle-btn" onclick="toggleFullscreen()">OFF</button>
+      </div>
+      <div class="setting-row">
+        <label class="setting-label">BRILHO</label>
+        <div class="slider-wrap">
+          <input type="range" min="0" max="100" value="50" id="brightness" oninput="updateSetting('brightness',this.value);document.getElementById('brightness-val').textContent=this.value"/>
+          <span id="brightness-val" class="slider-val">50</span>
+        </div>
+      </div>
+    </div>
+    <div id="tab-controls" class="tab-content hidden">
+      <div class="setting-row">
+        <label class="setting-label">PLATAFORMA</label>
+        <div class="option-group">
+          <button id="plat-pc" class="opt-btn active" onclick="setPlatform('pc')">💻 PC</button>
+          <button id="plat-mobile" class="opt-btn" onclick="setPlatform('mobile')">📱 MOBILE</button>
+        </div>
+      </div>
+      <div id="controls-pc" class="controls-layout">
+        <p class="controls-title">TECLADO</p>
+        <div class="key-map">
+          <div class="key-row"><span class="key">W / ↑</span><span class="key-desc">Pular</span></div>
+          <div class="key-row"><span class="key">A / ←</span><span class="key-desc">Mover Esquerda</span></div>
+          <div class="key-row"><span class="key">D / →</span><span class="key-desc">Mover Direita</span></div>
+          <div class="key-row"><span class="key">S / ↓</span><span class="key-desc">Agachar</span></div>
+          <div class="key-row"><span class="key">ESPAÇO</span><span class="key-desc">Atacar</span></div>
+          <div class="key-row"><span class="key">ESC</span><span class="key-desc">Pausar</span></div>
+        </div>
+      </div>
+      <div id="controls-mobile" class="controls-layout hidden">
+        <p class="controls-title">TOUCH</p>
+        <div class="key-map">
+          <div class="key-row"><span class="key">D-PAD</span><span class="key-desc">Mover</span></div>
+          <div class="key-row"><span class="key">BTN A</span><span class="key-desc">Pular</span></div>
+          <div class="key-row"><span class="key">BTN B</span><span class="key-desc">Atacar</span></div>
+        </div>
+        <p class="controls-note">⚠ Controles on-screen aparecerão no jogo!</p>
+      </div>
+    </div>
+    <div id="tab-promo" class="tab-content hidden">
+      <p class="promo-desc">Tem um código promocional? Resgate aqui para ganhar Nuggets bônus e outros segredos!</p>
+      <div class="promo-input-row">
+        <input type="text" id="promo-input" class="promo-input" placeholder="DIGITE O CÓDIGO..." maxlength="20" oninput="this.value=this.value.toUpperCase()"/>
+        <button class="promo-btn" onclick="redeemCode()">RESGATAR</button>
+      </div>
+      <div id="promo-result"></div>
+      <div class="promo-history-title">CÓDIGOS JÁ RESGATADOS:</div>
+      <div id="promo-history"></div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
